@@ -1,0 +1,61 @@
+-- TEMPO
+
+setcps 0.5
+
+-- MIDI clock
+
+p "midiclock" $ midicmd "midiClock*48" # s "machine"
+
+
+
+-- glitch beat using Machine 2 via MIDI Polyplex an Reaktor S-Layer instruments automating tempo
+
+do 
+    let pat = "{c5@7 c5@9 e5@10 e5@3 g5@1 c5@3 a5@2 e5@7 c6@2 d5@3}%<16,8>"
+        limit p = (|* gain 1.2) $ p
+        modpat p = every 3 rev $ p
+        scb = someCyclesBy
+        machine = s "machine"
+    d1  $ limit 
+        $ modpat
+        $ slow 3
+        $ scb 0.7 (stutWith ((5 ~>) $ choose [4,8,7,3]) ((6 ~>) $ choose [1/16,3/16,1/8,1/3]) (|* gain 0.9)) 
+        $ n  pat 
+        # machine
+        # midichan 0
+        # gain "[1 0.9 0.8 1.2 1.1]/2"
+        # cps "0.7@32 0.2@16 0.5@16"
+
+
+do 
+    let pat = "{c5@7}%<16,8>"
+        limit p = (|* gain 1.2) $ p
+        modpat p = every 3 rev $ p
+        scb = someCyclesBy
+        machine = s "machine"
+    d2  $ limit 
+        $ modpat
+        $ slow 4
+        $ scb 0.6 (stutWith ((5 ~>) $ choose [4,8,7,3]) ((6 ~>) $ choose [1/16,3/16,1/8,1/3]) (|* gain 0.9)) 
+        $ n  pat 
+        # machine
+        # midichan 1
+        # gain "[1 0.9 0.8 1.2 1.1]/2"
+        # cps "0.7@32 0.2@16 0.5@16"
+
+
+-- randomized grains 
+
+do
+    p "simple" 
+        $ sometimesBy 1 (# speed "20 30 0.2")
+        $ sometimesBy 0.3 (# gain 0.8) 
+        $ degradeBy 0.9 
+        $ sound  "[bd@3 bd(3,5) bd, sd cp sd cp?, arpy@2 arpy:1@3, odx@0.4]"
+        # room "0.9 1.3 1.5 0.4"
+        # size "0.1 1.2 0.3 0.9"
+
+
+
+-- silence everything disables MIDI clock as well
+hush
