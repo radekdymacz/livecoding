@@ -1,6 +1,6 @@
 -- TEMPO
 
-setcps 0.5
+setcps 1
 
 -- MIDI clock
 
@@ -47,14 +47,25 @@ do
 -- randomized grains 
 
 do
-    p "simple" 
-        $ sometimesBy 1 (# speed "20 30 0.2")
+    setcps 0.5
+    let pat = "[bd@3 bd(3,5) bd, sd cp(3,7) ~ sd cp?, arpy@2 arpy:1@3, odx@0.4]"
+        tempos = ( range 0 50 $ rand )   -- "20 30 0 40 15 18 12 6"
+    p "grain" 
+        $ sometimesBy 1 (# speed tempos)
         $ sometimesBy 0.3 (# gain 0.8) 
-        $ degradeBy 0.9 
-        $ sound  "[bd@3 bd(3,5) bd, sd cp sd cp?, arpy@2 arpy:1@3, odx@0.4]"
-        # room "0.9 1.3 1.5 0.4"
-        # size "0.1 1.2 0.3 0.9"
-
+        $ sometimesBy 0.2 (# crush "4 2 1")
+        $ sometimesBy 1 (# cps "1 0.2 2 5")
+        $ degradeBy (range 0 0.3 $ rand )
+        $ every 3 (0.25 ~>)
+        $ every 4 rev
+        $ stut "5 9 2 8" 0.3 0.125
+        $ degradeBy (range 0.8 0.9 $ rand )
+        $ every 3 (0.25 ~>)
+        $ s pat
+        # room "[0.9 0.3 0.8]/4"
+        # size "0.8 0.2 1.3 0.9"
+        # pan (rand)
+        
 
 
 -- silence everything disables MIDI clock as well
